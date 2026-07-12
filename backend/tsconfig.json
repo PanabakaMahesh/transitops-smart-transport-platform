@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    /* Language */
+    "target": "ES2022",
+    "lib": ["ES2022"],
+
+    /* Module */
+    "module": "CommonJS",
+    "moduleResolution": "node",
+
+    /* Project Structure */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Module Interoperability */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* Strict Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+
+    /* Source Maps */
+    "sourceMap": true,
+    "removeComments": false,
+
+    /* Quality */
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    /* Node Types */
+    "types": ["node"]
+  },
+
+  "include": ["src/**/*"],
+
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
