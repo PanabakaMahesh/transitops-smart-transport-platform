@@ -1,6 +1,4 @@
-import { NavigationItem } from "@/types/navigation";
-
-export const navigation: NavigationItem[] = [
+export const navigation = [
   {
     id: 1,
     title: "Dashboard",
@@ -34,7 +32,7 @@ export const navigation: NavigationItem[] = [
   {
     id: 6,
     title: "Fuel & Expenses",
-    path: "/fuel-expenses",
+    path: "/fuel",
     icon: "Fuel",
   },
   {
