@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import authRoutes from "./auth.routes";
 import vehicleRoutes from "./vehicle.routes";
+import driverRoutes from "./driver.routes";
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.get("/", (_req, res) => {
 });
 
 router.use("/api/auth", authRoutes);
-
 router.use("/api/vehicles", vehicleRoutes);
+router.use("/api/drivers", driverRoutes);
 
 export default router;
