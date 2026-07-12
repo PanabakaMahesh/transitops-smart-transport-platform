@@ -8,35 +8,33 @@
     "module": "CommonJS",
     "moduleResolution": "node",
 
-    /* Directories */
+    /* Project Structure */
     "rootDir": "./src",
     "outDir": "./dist",
 
-    /* Interop */
+    /* Module Interoperability */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
 
-    /* Type Checking */
+    /* Strict Type Checking */
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
 
-    /* Paths */
-    "resolveJsonModule": true,
-
-    /* Emit */
+    /* Source Maps */
     "sourceMap": true,
     "removeComments": false,
 
-    /* Misc */
+    /* Quality */
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
-    /* Types */
+    /* Node Types */
     "types": ["node"]
   },
 
-  "include": ["src"],
+  "include": ["src/**/*"],
 
   "exclude": [
     "node_modules",
