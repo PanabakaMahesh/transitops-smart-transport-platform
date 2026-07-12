@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import {
   CreateTripInput,
@@ -31,52 +32,54 @@ class TripService {
       throw new Error("Driver not found");
     }
 
-    // Vehicle availability
+    // Check Vehicle Availability
     if (vehicle.status !== "AVAILABLE") {
       throw new Error("Vehicle is not available");
     }
 
-    // Driver availability
+    // Check Driver Availability
     if (driver.status !== "AVAILABLE") {
       throw new Error("Driver is not available");
     }
 
-    // Transaction
-    const trip = await prisma.$transaction(async (tx) => {
-      const createdTrip = await tx.trip.create({
-        data: {
-          origin: data.origin,
-          destination: data.destination,
-          departureTime: new Date(data.departureTime),
-          arrivalTime: data.arrivalTime
-            ? new Date(data.arrivalTime)
-            : null,
-          vehicleId: data.vehicleId,
-          driverId: data.driverId,
-          status: data.status ?? "SCHEDULED",
-        },
-      });
+    // Create Trip + Update Statuses
+    const trip = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const createdTrip = await tx.trip.create({
+          data: {
+            origin: data.origin,
+            destination: data.destination,
+            departureTime: new Date(data.departureTime),
+            arrivalTime: data.arrivalTime
+              ? new Date(data.arrivalTime)
+              : null,
+            vehicleId: data.vehicleId,
+            driverId: data.driverId,
+            status: data.status ?? "SCHEDULED",
+          },
+        });
 
-      await tx.vehicle.update({
-        where: {
-          id: data.vehicleId,
-        },
-        data: {
-          status: "ON_TRIP",
-        },
-      });
+        await tx.vehicle.update({
+          where: {
+            id: data.vehicleId,
+          },
+          data: {
+            status: "ON_TRIP",
+          },
+        });
 
-      await tx.driver.update({
-        where: {
-          id: data.driverId,
-        },
-        data: {
-          status: "ON_TRIP",
-        },
-      });
+        await tx.driver.update({
+          where: {
+            id: data.driverId,
+          },
+          data: {
+            status: "ON_TRIP",
+          },
+        });
 
-      return createdTrip;
-    });
+        return createdTrip;
+      }
+    );
 
     return trip;
   }
@@ -126,44 +129,46 @@ class TripService {
   ) {
     const existingTrip = await this.getTripById(id);
 
-    const updatedTrip = await prisma.$transaction(async (tx) => {
-      const trip = await tx.trip.update({
-        where: {
-          id,
-        },
-        data: {
-          ...data,
-          departureTime: data.departureTime
-            ? new Date(data.departureTime)
-            : undefined,
-          arrivalTime: data.arrivalTime
-            ? new Date(data.arrivalTime)
-            : undefined,
-        },
-      });
-
-      if (data.status === "COMPLETED") {
-        await tx.vehicle.update({
+    const updatedTrip = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const trip = await tx.trip.update({
           where: {
-            id: existingTrip.vehicleId,
+            id,
           },
           data: {
-            status: "AVAILABLE",
+            ...data,
+            departureTime: data.departureTime
+              ? new Date(data.departureTime)
+              : undefined,
+            arrivalTime: data.arrivalTime
+              ? new Date(data.arrivalTime)
+              : undefined,
           },
         });
 
-        await tx.driver.update({
-          where: {
-            id: existingTrip.driverId,
-          },
-          data: {
-            status: "AVAILABLE",
-          },
-        });
+        if (data.status === "COMPLETED") {
+          await tx.vehicle.update({
+            where: {
+              id: existingTrip.vehicleId,
+            },
+            data: {
+              status: "AVAILABLE",
+            },
+          });
+
+          await tx.driver.update({
+            where: {
+              id: existingTrip.driverId,
+            },
+            data: {
+              status: "AVAILABLE",
+            },
+          });
+        }
+
+        return trip;
       }
-
-      return trip;
-    });
+    );
 
     return updatedTrip;
   }
@@ -174,31 +179,33 @@ class TripService {
   async deleteTrip(id: string) {
     const trip = await this.getTripById(id);
 
-    await prisma.$transaction(async (tx) => {
-      await tx.trip.delete({
-        where: {
-          id,
-        },
-      });
+    await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        await tx.trip.delete({
+          where: {
+            id,
+          },
+        });
 
-      await tx.vehicle.update({
-        where: {
-          id: trip.vehicleId,
-        },
-        data: {
-          status: "AVAILABLE",
-        },
-      });
+        await tx.vehicle.update({
+          where: {
+            id: trip.vehicleId,
+          },
+          data: {
+            status: "AVAILABLE",
+          },
+        });
 
-      await tx.driver.update({
-        where: {
-          id: trip.driverId,
-        },
-        data: {
-          status: "AVAILABLE",
-        },
-      });
-    });
+        await tx.driver.update({
+          where: {
+            id: trip.driverId,
+          },
+          data: {
+            status: "AVAILABLE",
+          },
+        });
+      }
+    );
 
     return {
       message: "Trip deleted successfully",
