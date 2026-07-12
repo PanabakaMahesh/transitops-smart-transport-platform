@@ -1,18 +1,17 @@
 import { Router } from "express";
+import authRoutes from "./auth.routes";
 
 const router = Router();
 
-/**
- * Health Check Route
- */
-
 router.get("/", (_req, res) => {
-  res.status(200).json({
+  res.json({
     success: true,
     message: "Welcome to TransitOps Backend API",
     version: "1.0.0",
-    status: "Running"
+    status: "Running",
   });
 });
+
+router.use("/api/auth", authRoutes);
 
 export default router;

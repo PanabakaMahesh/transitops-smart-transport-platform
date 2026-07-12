@@ -50,7 +50,7 @@ app.use(express.urlencoded({ extended: true }));
  * API Routes
  * ==============================
  */
-app.use("/", indexRoutes);
+app.use(indexRoutes);
 
 /**
  * ==============================
